@@ -90,7 +90,10 @@ module Trainees
     end
 
     def trainees_on_science_courses(trainees)
-      trainees.with_subject_or_allocation_subject("physics").or(trainees.with_subject_or_allocation_subject("chemistry").or(trainees.with_subject_or_allocation_subject("biology")))
+      trainees.with_subject_or_allocation_subject("physics")
+              .or(trainees.with_subject_or_allocation_subject("chemistry")
+              .or(trainees.with_subject_or_allocation_subject("biology"))
+              .or(trainees.with_subject_or_allocation_subject("general_sciences")))
     end
 
     def text_search(trainees, text_search)

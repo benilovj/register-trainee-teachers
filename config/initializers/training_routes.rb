@@ -133,6 +133,7 @@ SEED_BURSARIES = [
     academic_cycle_id: CURRENT_ACADEMIC_CYCLE_ID,
     allocation_subjects: [
       AllocationSubjects::BIOLOGY,
+      AllocationSubjects::GENERAL_SCIENCES,
     ],
   ),
   OpenStruct.new(
