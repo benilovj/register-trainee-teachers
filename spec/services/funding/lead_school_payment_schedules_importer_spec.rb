@@ -273,10 +273,13 @@ module Funding
         }
       end
 
-      subject { described_class.call(attributes: invalid_schedules_attributes, first_predicted_month_index: 12) }
+      before do
+        allow_any_instance_of(described_class).to receive(:puts).with(any_args)
+      end
 
-      it "raises" do
-        expect { subject }.to raise_error(PayableNotFoundError, "payable with id: 105491 doesn't exist")
+      it "prints out details of the missing organisation" do
+        expect_any_instance_of(described_class).to receive(:puts).with("Lead school URN: 105491 (Lead School 3)")
+        described_class.call(attributes: invalid_schedules_attributes, first_predicted_month_index: 12)
       end
     end
   end

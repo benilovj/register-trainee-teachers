@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module Funding
-  class PayableNotFoundError < StandardError; end
-
   class PayablePaymentSchedulesImporter
     include ServicePattern
 
@@ -11,12 +9,18 @@ module Funding
     def initialize(attributes:, first_predicted_month_index:)
       @attributes = attributes
       @first_predicted_month_index = first_predicted_month_index
+      @missing_providers = []
     end
 
+    # rubocop:disable Rails/Output
     def call
-      attributes.each_key do |id|
+      attributes.each do |id, rows|
         payable = payable(id)
-        raise(PayableNotFoundError, "payable with id: #{id} doesn't exist") if payable.nil?
+
+        if payable.nil?
+          missing_providers << missing_error_msg(id, rows.first)
+          next
+        end
 
         schedule = payable.funding_payment_schedules.create
 
@@ -34,15 +38,25 @@ module Funding
           end
         end
       end
+
+      missing_providers.each do |info|
+        puts("Missing organisations\n")
+        puts(info)
+      end
     end
+    # rubocop:enable Rails/Output
 
     def payable(_id)
       raise(NotImplementedException("implement a payable method"))
     end
 
+    def missing_error_msg(_id, _row_details)
+      raise(NotImplementedException("implement a missing_error_msg method"))
+    end
+
   private
 
-    attr_reader :attributes, :first_predicted_month_index
+    attr_reader :attributes, :first_predicted_month_index, :missing_providers
 
     def year_for_month(year_string, month_index)
       years = year_string.split("/")
